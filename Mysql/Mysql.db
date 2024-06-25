@@ -1,0 +1,41 @@
+-- Tabla de usuarios
+CREATE TABLE usuarios (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    correo VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL
+);
+
+-- Tabla de dispositivos
+CREATE TABLE dispositivos (
+    id_dispositivo INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT,
+    ip VARCHAR(15),
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id)
+);
+
+-- Tabla de tópicos
+CREATE TABLE topicos (
+    id_topico INT AUTO_INCREMENT PRIMARY KEY,
+    nombretopico VARCHAR(255) NOT NULL,
+    id_dispositivo INT,
+    FOREIGN KEY (id_dispositivo) REFERENCES dispositivos(id_dispositivo)
+);
+
+-- Tabla de historiador
+CREATE TABLE historiador (
+    id_historiador INT AUTO_INCREMENT PRIMARY KEY,
+    id_topico INT,
+    dato VARCHAR(255),
+    fechayhora DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_topico) REFERENCES topicos(id_topico)
+);
+
+-- Trigger para actualizar la fecha y hora automáticamente
+DELIMITER $$
+CREATE TRIGGER update_fechayhora
+BEFORE INSERT ON historiador
+FOR EACH ROW
+BEGIN
+    SET NEW.fechayhora = CONVERT_TZ(NOW(), 'UTC', 'America/Argentina/Buenos_Aires');
+END$$
+DELIMITER ;
